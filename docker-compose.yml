@@ -1,0 +1,56 @@
+services:
+
+  # database:
+  #   container_name: database
+  #   env_file:
+  #     - ./.env
+  #   image: postgres:15.1
+  #   environment:
+  #     POSTGRES_PASSWORD: $DATABASE_PASSWORD
+  #     POSTGRES_USER: user
+  #     POSTGRES_DB: database
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - database-data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "pg_isready",
+  #         "-q",
+  #         "-d",
+  #         "database",
+  #         "-U",
+  #         "user"
+  #       ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  server:
+    container_name: server
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    restart: on-failure
+    # depends_on:
+      # database:
+        # condition: service_healthy
+    command: "npm run start:dev"
+    volumes:
+      - ./src:/var/www/server/src
+      - .env:/var/www/server/.env
+
+  # volumes:
+  # database-data:
+  #   driver: local
+  #   name: pe-database
+  # server-modules:
+  #   driver: local
+  #   name: pe-server-modules
+  # server-dist:
+  #   driver: local
+  #   name: pe-server-dist
