@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { AuthModule } from "./auth/auth.module";
+import { DishModule } from "./dish/dish.module";
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
         // logging: true
       })
     }),
+    AuthModule,
+    DishModule,
   ],
   controllers: [],
   providers: [],

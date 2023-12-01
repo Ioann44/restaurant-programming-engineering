@@ -1,12 +1,15 @@
 import { Body, Controller, OnModuleInit, Post } from '@nestjs/common';
 import { AuthService } from "./auth.service";
-import { UserFormat } from "../users/users.dto";
 import { ConfigService } from '@nestjs/config';
+import { AuthDto } from './auth.dto';
 
-@Controller('auth')
+@Controller('auth/')
 export class AuthController implements OnModuleInit {
 
-    constructor(private authService: AuthService, private config: ConfigService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly config: ConfigService
+    ) { }
 
     async onModuleInit() {
         this.authService.registration({
@@ -15,12 +18,12 @@ export class AuthController implements OnModuleInit {
         });
     }
 
-    @Post('/login')
-    login(@Body() userDto: UserFormat) {
-        return this.authService.login(userDto)
+    @Post('login')
+    login(@Body() authDto: AuthDto) {
+        return this.authService.login(authDto);
     }
 
-    // @Post('/registration')
+    // @Post('registration')
     // registration(@Body() userDto: UserFormat) {
     //     return this.authService.registration(userDto)
     // }
