@@ -23,7 +23,6 @@ export class JwtAuthGuard implements CanActivate {
 
             const user = this.jwtService.verify(token);
             req.user = user;
-            console.log(user);
 
             const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
             if (!requiredRoles) {

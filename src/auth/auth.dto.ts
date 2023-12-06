@@ -1,7 +1,11 @@
 import { RolesEnum } from "./auth.service";
 
 export class AuthDto {
+    id: number; // used admin on update
     email: string;
     password: string;
-    role: RolesEnum;
+    fullName: string;
+    role: RolesEnum; // not needed for client
+    phone: string;
+    address: string;
 }
