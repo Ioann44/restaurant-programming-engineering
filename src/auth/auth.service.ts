@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcryptjs'
 import { Repository } from 'typeorm';
@@ -6,6 +6,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { UserEntity } from "./auth.entity";
 import { AuthDto } from "./auth.dto";
+
+export const Roles = (...roles: number[]) => SetMetadata('roles', roles);
+
+export enum RolesEnum {
+    admin,
+    manager,
+    courier,
+    client
+}
 
 @Injectable()
 export class AuthService {
@@ -29,9 +38,9 @@ export class AuthService {
     }
 
     private async generateToken(user: UserEntity) {
-        const payload = { email: user.email, id: user.id, password: user.password }
+        const payload = { id: user.id, email: user.email, role: user.role };
         return {
-            token: this.jwtService.sign(payload)
+            token: await this.jwtService.signAsync(payload)
         }
     }
 

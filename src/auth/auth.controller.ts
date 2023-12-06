@@ -1,5 +1,5 @@
 import { Body, Controller, OnModuleInit, Post } from '@nestjs/common';
-import { AuthService } from "./auth.service";
+import { AuthService, RolesEnum } from "./auth.service";
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './auth.dto';
 
@@ -14,7 +14,8 @@ export class AuthController implements OnModuleInit {
     async onModuleInit() {
         this.authService.registration({
             email: this.config.get<string>('ADMIN_EMAIL'),
-            password: this.config.get<string>('ADMIN_PASSWORD')
+            password: this.config.get<string>('ADMIN_PASSWORD'),
+            role: RolesEnum.admin
         });
     }
 

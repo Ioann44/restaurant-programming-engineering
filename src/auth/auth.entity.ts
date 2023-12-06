@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity('users')
@@ -11,4 +11,7 @@ export class UserEntity {
 
     @Column({ length: 255, nullable: true })
     password: string;
+
+    @Column("int")
+    role: number;
 }
