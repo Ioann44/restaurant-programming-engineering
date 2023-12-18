@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { FileEntity } from "src/file/file.entity";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity('dishes')
@@ -23,4 +24,8 @@ export class DishEntity {
 
 	// @ManyToOne
 	// kitchen: number;
+
+	@OneToOne(() => FileEntity, { nullable: true })
+	@JoinColumn()
+	image: FileEntity;
 }

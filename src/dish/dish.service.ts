@@ -2,33 +2,52 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DishEntity } from "./dish.entity";
 import { Repository } from "typeorm";
-import { DishDto } from "./dish.dto";
+import { DishAdminDto } from "./dish.dto";
+import { FileService } from "src/file/file.service";
 
 @Injectable()
 export default class DishService {
     constructor(
         @InjectRepository(DishEntity) private readonly dishRep: Repository<DishEntity>,
+        private readonly fileService: FileService
     ) { }
 
     async getAll(): Promise<DishEntity[]> {
-        return this.dishRep.find();
+        return this.dishRep.find({ relations: { image: true } });
     }
 
-    async insertOne(input: DishDto): Promise<DishEntity> {
+    async getOne(id: number): Promise<DishEntity> {
+        return this.dishRep.findOne({ where: { id }, relations: { image: true } });
+    }
+
+    async insertOne(input: DishAdminDto): Promise<DishEntity> {
         const { id, ...inputWithoutId } = { ...input };
         const saved = await this.dishRep.save(inputWithoutId);
-        return this.dishRep.findOne({ where: { id: saved.id } }); // add relation
+        return this.dishRep.findOne({ where: { id: saved.id }, relations: { image: true } });
     }
 
-    async update(input: DishDto): Promise<DishEntity> {
-        const saved = await this.dishRep.update(input.id, input);
-        return this.dishRep.findOne({ where: { id: input.id } });
+    async update(input: DishAdminDto): Promise<DishEntity> {
+        var oldItem = await this.dishRep.findOne({ where: { id: input.id }, relations: { image: true } });
+        if (oldItem) {
+            const oldImage = oldItem.image;
+            await this.dishRep.update(input.id, input);
+            if (input.image) {
+                if (oldItem.image) {
+                    await this.fileService.removeFile(oldItem.image.id);
+                }
+            }
+        }
+        return this.dishRep.findOne({ where: { id: input.id }, relations: { image: true } });
     };
 
     async deleteOne(id: number): Promise<number> {
-        // var wtsObject = await this.dishRep.findOne({ where: { id }}); // add relation
-        // also remove connected file
-        await this.dishRep.delete({ id });
+        var item = await this.dishRep.findOne({ where: { id }, relations: { image: true } });
+        if (item) {
+            if (item.image) {
+                await this.fileService.removeFile(item.image.id);
+            }
+            await this.dishRep.delete({ id });
+        }
         return id;
     }
 }
