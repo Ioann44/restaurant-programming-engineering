@@ -14,17 +14,17 @@ export class JwtAuthGuard implements CanActivate {
         const req = context.switchToHttp().getRequest()
         try {
             const authHeader = req.headers.authorization;
-            const bearer = authHeader.split(' ')[0]
-            const token = authHeader.split(' ')[1]
+            const bearer = authHeader.split(" ")[0]
+            const token = authHeader.split(" ")[1]
 
-            if (bearer !== 'Bearer' || !token) {
-                throw new UnauthorizedException({ message: 'Пользователь не авторизован' })
+            if (bearer !== "Bearer" || !token) {
+                throw new UnauthorizedException({ message: "Пользователь не авторизован" })
             }
 
             const user = this.jwtService.verify(token);
             req.user = user;
 
-            const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+            const requiredRoles = this.reflector.get<string[]>("roles", context.getHandler());
             if (!requiredRoles) {
                 return true;
             }
@@ -32,9 +32,9 @@ export class JwtAuthGuard implements CanActivate {
                 return true;
             }
 
-            throw new UnauthorizedException({ message: 'У вас нет необходимых прав для доступа' });
+            throw new UnauthorizedException({ message: "У вас нет необходимых прав для доступа" });
         } catch (e) {
-            throw new UnauthorizedException({ message: 'Пользователь не авторизован' })
+            throw new UnauthorizedException({ message: "Пользователь не авторизован" })
         }
     }
 

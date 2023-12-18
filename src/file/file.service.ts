@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { FileEntity } from './file.entity';
-import { MinioService } from './minio.service';
-import { randomUUID } from 'crypto';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { FileEntity } from "./file.entity";
+import { MinioService } from "./minio.service";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class FileService {
@@ -13,7 +13,7 @@ export class FileService {
 	) { }
 
 	async createFile(file: Express.Multer.File): Promise<FileEntity> {
-		const key = randomUUID() + '-' + file.originalname.replace(/ /g, '_');
+		const key = randomUUID() + "-" + file.originalname.replace(/ /g, "_");
 		await this.minioService.uploadFile(file, key);
 		return this.filesRep.save({
 			originalName: file.originalname,

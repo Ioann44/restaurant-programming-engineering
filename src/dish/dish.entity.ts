@@ -2,7 +2,7 @@ import { FileEntity } from "src/file/file.entity";
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 
-@Entity('dishes')
+@Entity("dishes")
 export class DishEntity {
 	@PrimaryGeneratedColumn()
 	id: number;

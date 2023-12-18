@@ -1,13 +1,13 @@
-import { ConflictException, ForbiddenException, Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, SetMetadata, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from 'bcryptjs'
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from "bcryptjs"
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 
 import { UserEntity } from "./auth.entity";
 import { AuthDto } from "./auth.dto";
 
-export const Roles = (...roles: RolesEnum[]) => SetMetadata('roles', roles);
+export const Roles = (...roles: RolesEnum[]) => SetMetadata("roles", roles);
 
 export enum RolesEnum {
     admin,
@@ -28,14 +28,14 @@ export class AuthService {
         if (user && passwordEquals) {
             return this.generateToken(user);
         }
-        throw new UnauthorizedException({ message: 'Некорректный емайл или пароль' })
+        throw new UnauthorizedException({ message: "Некорректный емайл или пароль" })
     }
 
     async register(authDto: AuthDto): Promise<Object> {
         const { id, ...dtoNoId } = { ...authDto };
         const candidate = await this.userRep.findOne({ where: { email: authDto.email } });
         if (candidate) {
-            throw new ConflictException('Этот логин уже занят');
+            throw new ConflictException("Этот логин уже занят");
         }
         const hashPassword = await bcrypt.hash(authDto.password, 5);
         const user = await this.userRep.save({ ...dtoNoId, password: hashPassword });
