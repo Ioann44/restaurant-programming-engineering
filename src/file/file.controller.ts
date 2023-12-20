@@ -13,21 +13,21 @@ export class FileController {
 
     @Get("one/:id")
     @UseGuards(JwtAuthGuard)
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     async getOne(@Param("id") id: number): Promise<FileEntity> {
         return this.filesService.getOneFile(id);
     }
 
     @Get("all")
     @UseGuards(JwtAuthGuard)
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     async getAll(): Promise<FileEntity[]> {
         return this.filesService.getAll();
     }
 
     @Post("")
     @UseGuards(JwtAuthGuard)
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     @UseInterceptors(FileInterceptor("file"))
     async upload(@UploadedFile() file): Promise<FileEntity> {
         return this.filesService.createFile(file);
@@ -35,7 +35,7 @@ export class FileController {
 
     @Delete("all")
     @UseGuards(JwtAuthGuard)
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     async removeAll(): Promise<Number> {
         // Deletes only unused files in mind, but somehow deletes them from index_page gallery too
         // Returns number of deleted files
@@ -44,7 +44,7 @@ export class FileController {
 
     @Delete(":id")
     @UseGuards(JwtAuthGuard)
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     async removeOne(@Param("id") id: number): Promise<number> {
         this.filesService.removeFile(id);
         return id;

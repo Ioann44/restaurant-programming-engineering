@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Patch, Put, Delete, UseGuards, UseInterceptors, UploadedFiles } from "@nestjs/common";
-import { DishAdminDto, DishAdminDtoOnLoad, DishPublicDto } from "./dish.dto";
+import { DishDto } from "./dish.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import DishService from "./dish.service";
 import { Roles, RolesEnum } from "src/auth/auth.service";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { plainToInstance } from "class-transformer";
 import { FileService } from "src/file/file.service";
+import { DishService } from "./dish.service";
 
 @Controller("dish/")
 export class DishController {
@@ -15,19 +15,25 @@ export class DishController {
     ) { }
 
     @Get("")
-    async getAll(): Promise<DishPublicDto[]> {
+    async getAll(): Promise<DishDto[]> {
         return (await this.dishService.getAll()).map(
             item => {
                 return { ...item, image: item.image ? item.image.key : "" };
             });
     }
 
-    @Roles(RolesEnum.admin)
+    @Get("one/:id")
+    async getOne(@Param("id") id: number): Promise<DishDto> {
+        const dish = await this.dishService.getOne(id);
+        return { ...dish, image: dish.image ? dish.image.key : "" };
+    }
+
+    @Roles(RolesEnum.Admin)
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FilesInterceptor("image"))
     @Put("")
-    async create(@Body() inputInData, @UploadedFiles() images: Express.Multer.File[]): Promise<DishAdminDto> {
-        const input: DishAdminDto = plainToInstance(DishAdminDto, JSON.parse(inputInData.data));
+    async create(@Body() inputInData, @UploadedFiles() images: Express.Multer.File[]): Promise<DishDto> {
+        const input: DishDto = plainToInstance(DishDto, JSON.parse(inputInData.data));
 
         const isFileLoaded = images.length != 0;
         if (isFileLoaded) {
@@ -39,7 +45,7 @@ export class DishController {
             if (isFileLoaded) {
                 savedId = (await this.dishService.insertOne({ ...input, image: loadedImage })).id;
             } else {
-                savedId = (await this.dishService.insertOne(input)).id;
+                savedId = (await this.dishService.insertOne({ ...input, image: null })).id;
             }
         } catch (error) {
             if (isFileLoaded) {
@@ -48,15 +54,15 @@ export class DishController {
             return error;
         }
 
-        return this.dishService.getOne(savedId);
+        return this.getOne(savedId);
     }
 
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FilesInterceptor("image"))
     @Patch()
-    async update(@Body() inputInData, @UploadedFiles() images: Express.Multer.File[]): Promise<DishAdminDto> {
-        const input: DishAdminDto = plainToInstance(DishAdminDto, JSON.parse(inputInData.data));
+    async update(@Body() inputInData, @UploadedFiles() images: Express.Multer.File[]): Promise<DishDto> {
+        const { image, ...input }: DishDto = { ...plainToInstance(DishDto, JSON.parse(inputInData.data)) };
 
         const isFileLoaded = images.length != 0;
         if (isFileLoaded) {
@@ -67,7 +73,7 @@ export class DishController {
             if (isFileLoaded) {
                 await this.dishService.update({ ...input, image: loadedImage });
             } else {
-                await this.dishService.update(input);
+                await this.dishService.update(input as any);
             }
         } catch (error) {
             if (isFileLoaded) {
@@ -76,10 +82,10 @@ export class DishController {
             return error;
         }
 
-        return this.dishService.getOne(input.id);
+        return this.getOne(input.id);
     }
 
-    @Roles(RolesEnum.admin)
+    @Roles(RolesEnum.Admin)
     @UseGuards(JwtAuthGuard)
     @Delete(":id")
     async deleteOne(@Param("id") id: number): Promise<number> {

@@ -4,67 +4,117 @@ import * as bcrypt from "bcryptjs"
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { UserEntity } from "./auth.entity";
-import { AuthDto } from "./auth.dto";
+import { ClientEntity, StaffEntity } from "./auth.entity";
+import { ClientDto, ClientSuppressedDto, StaffDto, StaffSuppressedDto } from "./auth.dto";
 
 export const Roles = (...roles: RolesEnum[]) => SetMetadata("roles", roles);
 
 export enum RolesEnum {
-    admin,
-    manager,
-    courier,
-    client
+    Admin,
+    Manager,
+    Courier,
+    Client
 }
 
 @Injectable()
-export class AuthService {
+export class StaffAuthService {
     constructor(
-        @InjectRepository(UserEntity) private readonly userRep: Repository<UserEntity>,
-        private jwtService: JwtService) { }
+        @InjectRepository(StaffEntity) private readonly staffRep: Repository<StaffEntity>,
+        private jwtService: JwtService
+    ) { }
 
-    async login(authDto: AuthDto): Promise<Object> {
-        const user = await this.userRep.findOne({ where: { email: authDto.email } });
-        const passwordEquals = await bcrypt.compare(authDto.password, user.password);
+    async login(input: StaffDto): Promise<Object> {
+        const user = await this.staffRep.findOne({ where: { email: input.email } });
+        const passwordEquals = await bcrypt.compare(input.password, user.password);
         if (user && passwordEquals) {
             return this.generateToken(user);
         }
         throw new UnauthorizedException({ message: "Некорректный емайл или пароль" })
     }
 
-    async register(authDto: AuthDto): Promise<Object> {
-        const { id, ...dtoNoId } = { ...authDto };
-        const candidate = await this.userRep.findOne({ where: { email: authDto.email } });
+    async register(input: StaffSuppressedDto): Promise<Object> {
+        const { id, ...dtoNoId } = { ...input };
+        const candidate = await this.staffRep.findOne({ where: { email: input.email } });
         if (candidate) {
             throw new ConflictException("Этот логин уже занят");
         }
-        const hashPassword = await bcrypt.hash(authDto.password, 5);
-        const user = await this.userRep.save({ ...dtoNoId, password: hashPassword });
+        const hashPassword = await bcrypt.hash(input.password, 5);
+        const user = await this.staffRep.save({ ...dtoNoId, password: hashPassword });
         return this.generateToken(user)
     }
 
-    async getAll(): Promise<UserEntity[]> {
-        return this.userRep.find();
+    async getAll(): Promise<StaffEntity[]> {
+        return this.staffRep.find();
     }
 
-    async update(input: AuthDto): Promise<AuthDto> {
-        const saved = await this.userRep.update(input.id, input);
-        return this.userRep.findOne({ where: { id: input.id } });
+    async update(input: StaffDto): Promise<StaffEntity> {
+        const { deliveries, password, ...inputShrinked } = { ...input };
+        const saved = await this.staffRep.update(input.id, inputShrinked);
+        return this.staffRep.findOne({ where: { id: input.id } });
     };
 
     async delete(id: number): Promise<number> {
-        // const user = await this.userRep.findOne({ where: { id } });
         if (id == 1) {
             throw new ForbiddenException("Нельзя удалить администратора-основателя");
         }
-        await this.userRep.delete({ id });
+        await this.staffRep.delete({ id });
         return id;
     }
 
-
-    private async generateToken(user: UserEntity): Promise<Object> {
+    private async generateToken(user: StaffEntity): Promise<Object> {
         const payload = { id: user.id, email: user.email, role: user.role };
         return {
             token: await this.jwtService.signAsync(payload)
+        };
+    }
+}
+
+@Injectable()
+export class ClientAuthService {
+    constructor(
+        @InjectRepository(ClientEntity) private readonly clientRep: Repository<ClientEntity>,
+        private jwtService: JwtService
+    ) { }
+
+    async login(input: ClientDto): Promise<Object> {
+        const user = await this.clientRep.findOne({ where: { email: input.email } });
+        const passwordEquals = await bcrypt.compare(input.password, user.password);
+        if (user && passwordEquals) {
+            return this.generateToken(user);
         }
+        throw new UnauthorizedException({ message: "Некорректный емайл или пароль" })
+    }
+
+    async register(input: ClientSuppressedDto): Promise<Object> {
+        const { id, ...dtoNoId } = { ...input };
+        const candidate = await this.clientRep.findOne({ where: { email: input.email } });
+        if (candidate) {
+            throw new ConflictException("Этот логин уже занят");
+        }
+        const hashPassword = await bcrypt.hash(input.password, 5);
+        const user = await this.clientRep.save({ ...dtoNoId, password: hashPassword });
+        return this.generateToken(user)
+    }
+
+    async getAll(): Promise<ClientEntity[]> {
+        return this.clientRep.find();
+    }
+
+    async update(input: ClientDto): Promise<ClientEntity> {
+        const { deliveries, reservations, password, ...inputShrinked } = { ...input };
+        const saved = await this.clientRep.update(input.id, inputShrinked);
+        return this.clientRep.findOne({ where: { id: input.id } });
+    };
+
+    async delete(id: number): Promise<number> {
+        await this.clientRep.delete({ id });
+        return id;
+    }
+
+    private async generateToken(user: ClientEntity): Promise<Object> {
+        const payload = { id: user.id, email: user.email, role: RolesEnum.Client };
+        return {
+            token: await this.jwtService.signAsync(payload)
+        };
     }
 }

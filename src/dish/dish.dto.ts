@@ -1,6 +1,4 @@
-import { FileEntity } from "src/file/file.entity";
-
-export class DishPublicDto {
+export class DishDto {
 	id: number;
 	name: string;
 	weight: number;
@@ -11,17 +9,6 @@ export class DishPublicDto {
 	image: string;
 }
 
-export class DishAdminDto {
-	id: number;
-	name: string;
-	weight: number;
-	desc: string;
-	calories: number;
-	price: number;
-	// kitchen: KitchenDTO;
-	image: FileEntity;
-}
-
-export class DishAdminDtoOnLoad {
-	data: DishAdminDto;
+export class DishDtoOnLoad {
+	data: DishDto;
 }

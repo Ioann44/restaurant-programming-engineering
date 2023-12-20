@@ -2,11 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DishEntity } from "./dish.entity";
 import { Repository } from "typeorm";
-import { DishAdminDto } from "./dish.dto";
 import { FileService } from "src/file/file.service";
 
 @Injectable()
-export default class DishService {
+export class DishService {
     constructor(
         @InjectRepository(DishEntity) private readonly dishRep: Repository<DishEntity>,
         private readonly fileService: FileService
@@ -20,13 +19,13 @@ export default class DishService {
         return this.dishRep.findOne({ where: { id }, relations: { image: true } });
     }
 
-    async insertOne(input: DishAdminDto): Promise<DishEntity> {
+    async insertOne(input: DishEntity): Promise<DishEntity> {
         const { id, ...inputWithoutId } = { ...input };
         const saved = await this.dishRep.save(inputWithoutId);
         return this.dishRep.findOne({ where: { id: saved.id }, relations: { image: true } });
     }
 
-    async update(input: DishAdminDto): Promise<DishEntity> {
+    async update(input: DishEntity): Promise<DishEntity> {
         var oldItem = await this.dishRep.findOne({ where: { id: input.id }, relations: { image: true } });
         if (oldItem) {
             const oldImage = oldItem.image;
