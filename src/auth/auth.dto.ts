@@ -8,6 +8,11 @@ export enum RolesEnum {
     Client
 }
 
+export class UserReturnedDto {
+    user: StaffDto | ClientDto;
+    token: string;
+}
+
 export class StaffSuppressedDto {
     id: number;
     role: RolesEnum;
@@ -42,7 +47,7 @@ export class ClientDto {
     reservations: ReservationDto;
 }
 
-export class jwtPayloadDto {
+export class JwtPayloadDto {
     id: number;
     role: RolesEnum;
     email: string;

@@ -32,10 +32,10 @@ export class ClientEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ length: 255, nullable: true })
+    @Column({ length: 255 })
     fullName: string;
 
-    @Column({ length: 15, nullable: true })
+    @Column({ length: 15 })
     phone: string;
 
     @Column({ length: 255, unique: true })
@@ -47,11 +47,9 @@ export class ClientEntity {
     @Column({ length: 255 })
     password: string;
 
-    // @Column()
-    @OneToMany(() => DeliveryEntity, (delivery) => delivery.client, { nullable: true })
+    @OneToMany(() => DeliveryEntity, (delivery) => delivery.client)
     deliveries: DeliveryEntity[];
 
-    // @Column()
-    @OneToMany(() => ReservationEntity, (reservation) => reservation.client, { nullable: true })
+    @OneToMany(() => ReservationEntity, (reservation) => reservation.client)
     reservations: ReservationEntity[];
 }

@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs"
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { ClientDto, ClientSuppressedDto, RolesEnum } from "./auth.dto";
+import { ClientDto, ClientSuppressedDto, RolesEnum, UserReturnedDto } from "./auth.dto";
 import { ClientEntity } from "./auth.entity";
 
 @Injectable()
@@ -13,16 +13,16 @@ export class ClientAuthService {
 		private jwtService: JwtService
 	) { }
 
-	async login(input: ClientDto): Promise<Object> {
+	async login(input: ClientDto): Promise<UserReturnedDto> {
 		const user = await this.clientRep.findOne({ where: { email: input.email } });
-		const passwordEquals = await bcrypt.compare(input.password, user.password);
-		if (user && passwordEquals) {
-			return this.generateToken(user);
+		if (user && await bcrypt.compare(input.password, user.password)) {
+			const { password, ...userShrinked } = { ...user };
+			return { token: await this.generateToken(user), user: userShrinked as any };
 		}
 		throw new UnauthorizedException({ message: "Некорректный емайл или пароль" })
 	}
 
-	async register(input: ClientSuppressedDto): Promise<Object> {
+	async register(input: ClientSuppressedDto): Promise<UserReturnedDto> {
 		const { id, ...dtoNoId } = { ...input };
 		const candidate = await this.clientRep.findOne({ where: { email: input.email } });
 		if (candidate) {
@@ -30,7 +30,8 @@ export class ClientAuthService {
 		}
 		const hashPassword = await bcrypt.hash(input.password, 5);
 		const user = await this.clientRep.save({ ...dtoNoId, password: hashPassword });
-		return this.generateToken(user)
+		const { password, ...userShrinked } = { ...user };
+		return { token: await this.generateToken(user), user: userShrinked as any };
 	}
 
 	async getAll(): Promise<ClientEntity[]> {
@@ -38,7 +39,10 @@ export class ClientAuthService {
 	}
 
 	async update(input: ClientDto): Promise<ClientEntity> {
-		const { deliveries, reservations, password, ...inputShrinked } = { ...input };
+		const { deliveries, reservations, email, ...inputShrinked } = { ...input };
+		if (input.password) {
+			inputShrinked.password = await bcrypt.hash(input.password, 5);
+		}
 		const saved = await this.clientRep.update(input.id, inputShrinked);
 		return this.clientRep.findOne({ where: { id: input.id } });
 	};
@@ -48,10 +52,8 @@ export class ClientAuthService {
 		return id;
 	}
 
-	private async generateToken(user: ClientEntity): Promise<Object> {
+	private async generateToken(user: ClientEntity): Promise<string> {
 		const payload = { id: user.id, email: user.email, role: RolesEnum.Client };
-		return {
-			token: await this.jwtService.signAsync(payload)
-		};
+		return this.jwtService.signAsync(payload);
 	}
 }

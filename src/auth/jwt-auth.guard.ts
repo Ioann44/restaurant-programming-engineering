@@ -1,7 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, SetMetadata, UnauthorizedException } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
+import { RolesEnum, JwtPayloadDto } from "./auth.dto";
+
+export const Roles = (...roles: RolesEnum[]) => SetMetadata("roles", roles);
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -11,11 +14,10 @@ export class JwtAuthGuard implements CanActivate {
     ) { }
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const req = context.switchToHttp().getRequest()
+        const req = context.switchToHttp().getRequest();
         try {
-            const authHeader = req.headers.authorization;
-            const bearer = authHeader.split(" ")[0]
-            const token = authHeader.split(" ")[1]
+            const authHeader: string = req.headers.authorization;
+            const [bearer, token] = authHeader.split(" ", 2);
 
             if (bearer !== "Bearer" || !token) {
                 throw new UnauthorizedException({ message: "Пользователь не авторизован" })
@@ -37,5 +39,15 @@ export class JwtAuthGuard implements CanActivate {
             throw new UnauthorizedException({ message: "Пользователь не авторизован" })
         }
     }
+}
 
+@Injectable()
+export class TokenParser {
+    constructor(private readonly jwtService: JwtService) { }
+
+    async parse(req: { headers: { authorization: string; }; }): Promise<JwtPayloadDto> {
+        const authHeader: string = req.headers.authorization;
+        const token = authHeader.split(" ")[1];
+        return this.jwtService.verify(token);
+    }
 }

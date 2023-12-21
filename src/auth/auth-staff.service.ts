@@ -1,13 +1,11 @@
-import { ConflictException, ForbiddenException, Injectable, SetMetadata, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs"
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import { StaffEntity } from "./auth.entity";
-import { RolesEnum, StaffDto, StaffSuppressedDto } from "./auth.dto";
-
-export const Roles = (...roles: RolesEnum[]) => SetMetadata("roles", roles);
+import { StaffDto, StaffSuppressedDto, UserReturnedDto } from "./auth.dto";
 
 @Injectable()
 export class StaffAuthService {
@@ -16,16 +14,16 @@ export class StaffAuthService {
         private jwtService: JwtService
     ) { }
 
-    async login(input: StaffDto): Promise<Object> {
+    async login(input: StaffDto): Promise<UserReturnedDto> {
         const user = await this.staffRep.findOne({ where: { email: input.email } });
-        const passwordEquals = await bcrypt.compare(input.password, user.password);
-        if (user && passwordEquals) {
-            return this.generateToken(user);
+        if (user && await bcrypt.compare(input.password, user.password)) {
+            const { password, ...userShrinked } = { ...user };
+            return { token: await this.generateToken(user), user: userShrinked as any };
         }
         throw new UnauthorizedException({ message: "Некорректный емайл или пароль" })
     }
 
-    async register(input: StaffSuppressedDto): Promise<Object> {
+    async register(input: StaffSuppressedDto): Promise<UserReturnedDto> {
         const { id, ...dtoNoId } = { ...input };
         const candidate = await this.staffRep.findOne({ where: { email: input.email } });
         if (candidate) {
@@ -33,7 +31,8 @@ export class StaffAuthService {
         }
         const hashPassword = await bcrypt.hash(input.password, 5);
         const user = await this.staffRep.save({ ...dtoNoId, password: hashPassword });
-        return this.generateToken(user)
+        const { password, ...userShrinked } = { ...user };
+        return { token: await this.generateToken(user), user: userShrinked as any };
     }
 
     async getAll(): Promise<StaffEntity[]> {
@@ -41,7 +40,10 @@ export class StaffAuthService {
     }
 
     async update(input: StaffDto): Promise<StaffEntity> {
-        const { deliveries, password, ...inputShrinked } = { ...input };
+        const { deliveries, ...inputShrinked } = { ...input };
+        if (input.password) {
+            inputShrinked.password = await bcrypt.hash(input.password, 5);
+        }
         const saved = await this.staffRep.update(input.id, inputShrinked);
         return this.staffRep.findOne({ where: { id: input.id } });
     };
@@ -54,10 +56,8 @@ export class StaffAuthService {
         return id;
     }
 
-    private async generateToken(user: StaffEntity): Promise<Object> {
+    private async generateToken(user: StaffEntity): Promise<string> {
         const payload = { id: user.id, email: user.email, role: user.role };
-        return {
-            token: await this.jwtService.signAsync(payload)
-        };
+        return this.jwtService.signAsync(payload);
     }
 }

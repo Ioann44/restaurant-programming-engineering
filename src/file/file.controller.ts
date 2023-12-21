@@ -3,8 +3,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { FileService } from "./file.service";
 import { MinioService } from "src/file/minio.service";
 import { FileEntity } from "./file.entity";
-import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { Roles } from "src/auth/auth-staff.service";
+import { JwtAuthGuard, Roles } from "src/auth/jwt-auth.guard";
 import { RolesEnum } from "src/auth/auth.dto";
 
 // using only for testing

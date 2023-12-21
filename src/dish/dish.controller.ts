@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Put, Delete, UseGuards, UseInterceptors, UploadedFiles } from "@nestjs/common";
 import { DishDto } from "./dish.dto";
-import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { Roles } from "src/auth/auth-staff.service";
+import { JwtAuthGuard, Roles } from "src/auth/jwt-auth.guard";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { plainToInstance } from "class-transformer";
 import { FileService } from "src/file/file.service";
