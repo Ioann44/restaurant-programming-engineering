@@ -25,6 +25,7 @@ export class DishEntity {
 	// @ManyToOne
 	// kitchen: number;
 
+	// @Column()
 	@OneToOne(() => FileEntity, { nullable: true })
 	@JoinColumn()
 	image: FileEntity;

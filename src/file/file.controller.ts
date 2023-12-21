@@ -4,7 +4,8 @@ import { FileService } from "./file.service";
 import { MinioService } from "src/file/minio.service";
 import { FileEntity } from "./file.entity";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { Roles, RolesEnum } from "src/auth/auth.service";
+import { Roles } from "src/auth/auth-staff.service";
+import { RolesEnum } from "src/auth/auth.dto";
 
 // using only for testing
 @Controller("file/")

@@ -1,6 +1,12 @@
 import { DeliveryDto } from "src/delivery/delivery.dto";
 import { ReservationDto } from "src/reservation/reservation.dto";
-import { RolesEnum } from "./auth.service";
+
+export enum RolesEnum {
+    Admin,
+    Manager,
+    Courier,
+    Client
+}
 
 export class StaffSuppressedDto {
     id: number;

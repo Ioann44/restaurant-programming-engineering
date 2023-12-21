@@ -8,7 +8,7 @@ import { randomUUID } from "crypto";
 @Injectable()
 export class FileService {
 	constructor(
-		@InjectRepository(FileEntity) private filesRep: Repository<FileEntity>,
+		@InjectRepository(FileEntity) private readonly filesRep: Repository<FileEntity>,
 		private minioService: MinioService
 	) { }
 

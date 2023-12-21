@@ -1,13 +1,14 @@
 import { Module } from "@nestjs/common";
 import { StaffAuthController } from "./auth.controller";
-import { ClientAuthService, StaffAuthService } from "./auth.service";
+import { StaffAuthService } from "./auth-staff.service";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ClientEntity } from "./auth.entity";
+import { ClientEntity, StaffEntity } from "./auth.entity";
+import { ClientAuthService } from "./auth-client.service";
 
 @Module({
     controllers: [StaffAuthController],
-    providers: [StaffAuthService],
+    providers: [StaffAuthService, ClientAuthService],
     imports: [
         JwtModule.register({
             secret: process.env.PRIVATE_KEY || "SECRET",
@@ -15,7 +16,7 @@ import { ClientEntity } from "./auth.entity";
                 expiresIn: "24h"
             }
         }),
-        TypeOrmModule.forFeature([ClientEntity]),
+        TypeOrmModule.forFeature([ClientEntity, StaffEntity]),
     ],
     exports: [
         StaffAuthService,

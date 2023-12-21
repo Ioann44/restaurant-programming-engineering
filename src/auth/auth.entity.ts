@@ -22,6 +22,7 @@ export class StaffEntity {
     @Column({ length: 255 })
     password: string;
 
+    // @Column()
     @OneToMany(() => DeliveryEntity, (delivery) => delivery.courier, { nullable: true })
     deliveries: DeliveryEntity[];
 }
@@ -46,9 +47,11 @@ export class ClientEntity {
     @Column({ length: 255 })
     password: string;
 
+    // @Column()
     @OneToMany(() => DeliveryEntity, (delivery) => delivery.client, { nullable: true })
     deliveries: DeliveryEntity[];
 
+    // @Column()
     @OneToMany(() => ReservationEntity, (reservation) => reservation.client, { nullable: true })
     reservations: ReservationEntity[];
 }

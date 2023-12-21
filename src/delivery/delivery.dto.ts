@@ -1,5 +1,10 @@
 import { DishDto } from "src/dish/dish.dto";
-import { DeliveryStatus } from "./delivery.service";
+
+export enum DeliveryStatus {
+	Accepted,
+	Delivering,
+	Done
+}
 
 export class DeliveryDto {
 	id: number;

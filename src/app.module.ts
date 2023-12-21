@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { DishModule } from "./dish/dish.module";
+import { FileModule } from "./file/file.module";
+import { DeliveryModule } from "./delivery/delivery.module";
+import { ReservationModule } from "./reservation/reservation.module";
 
 @Module({
   imports: [
@@ -23,7 +26,10 @@ import { DishModule } from "./dish/dish.module";
       })
     }),
     AuthModule,
+    FileModule,
     DishModule,
+    DeliveryModule,
+    ReservationModule
   ],
   controllers: [],
   providers: [],

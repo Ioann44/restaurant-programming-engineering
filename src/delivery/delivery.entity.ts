@@ -2,13 +2,14 @@ import { StaffDto } from "src/auth/auth.dto";
 import { ClientEntity, StaffEntity } from "src/auth/auth.entity";
 import { DishEntity } from "src/dish/dish.entity";
 import { Entity, PrimaryGeneratedColumn, ManyToMany, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { DeliveryStatus } from "./delivery.service";
+import { DeliveryStatus } from "./delivery.dto";
 
 @Entity("delivery-orders")
 export class DeliveryEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	// @Column()
 	@ManyToMany(() => DishEntity)
 	dishes: DishEntity[]
 
@@ -24,17 +25,19 @@ export class DeliveryEntity {
 	@CreateDateColumn()
 	createDate: Date;
 
-	@Column("datetime", { nullable: true })
+	@Column("timestamptz", { nullable: true })
 	finishDate: Date;
 
 	@Column("text")
 	address: string;
 
+	// @Column()
 	@ManyToOne(() => ClientEntity, { nullable: true })
 	@JoinColumn()
 	client: ClientEntity;
 
-	@ManyToOne(() => StaffDto, { nullable: true })
+	// @Column()
+	@ManyToOne(() => StaffEntity, { nullable: true })
 	@JoinColumn()
 	courier: StaffEntity
 }

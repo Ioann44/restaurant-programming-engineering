@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, OnModuleInit, Param, Patch, Post, Put, UseGuards, Request } from "@nestjs/common";
-import { StaffAuthService, Roles, RolesEnum, ClientAuthService } from "./auth.service";
+import { StaffAuthService, Roles } from "./auth-staff.service";
 import { ConfigService } from "@nestjs/config";
 import { JwtAuthGuard } from "./jwt-auth.guard";
-import { ClientDto, StaffDto, jwtPayloadDto } from "./auth.dto";
+import { ClientDto, RolesEnum, StaffDto, jwtPayloadDto } from "./auth.dto";
+import { ClientAuthService } from "./auth-client.service";
 
 @Controller("auth/admin")
 export class StaffAuthController implements OnModuleInit {

@@ -9,12 +9,13 @@ export class ReservationEntity {
 	@Column("int2")
 	personsCount: number;
 
-	@Column("datetime")
+	@Column("timestamptz")
 	reservationDate: Date;
 
 	@Column("int2", { array: true })
 	tables: number[];
 
+	// @Column()
 	@ManyToOne(() => ClientEntity, { nullable: true })
 	@JoinColumn()
 	client: ClientEntity;

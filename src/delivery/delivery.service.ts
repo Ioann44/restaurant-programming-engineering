@@ -3,12 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DeliveryEntity } from "./delivery.entity";
 
-export enum DeliveryStatus {
-	Accepted,
-	Delivering,
-	Done
-}
-
 @Injectable()
 export class DeliveryService {
 	constructor(

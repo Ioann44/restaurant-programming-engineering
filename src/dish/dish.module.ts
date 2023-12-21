@@ -4,13 +4,15 @@ import { DishController } from "./dish.controller";
 import { DishEntity } from "./dish.entity";
 import { FileModule } from "src/file/file.module";
 import { DishService } from "./dish.service";
+import { AuthModule } from "src/auth/auth.module";
 
 @Module({
     controllers: [DishController],
     providers: [DishService],
     imports: [
         TypeOrmModule.forFeature([DishEntity]),
-        FileModule
+        FileModule,
+        AuthModule
     ],
     exports: []
 })
