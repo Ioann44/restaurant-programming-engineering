@@ -17,7 +17,7 @@ export class ClientAuthService {
 		const user = await this.clientRep.findOne({ where: { email: input.email } });
 		if (user && await bcrypt.compare(input.password, user.password)) {
 			const { password, ...userShrinked } = { ...user };
-			return { token: await this.generateToken(user), user: userShrinked as any };
+			return { token: await this.generateToken(user), user: { ...userShrinked, role: RolesEnum.Client } as any };
 		}
 		throw new UnauthorizedException({ message: "Некорректный емайл или пароль" })
 	}
@@ -31,7 +31,7 @@ export class ClientAuthService {
 		const hashPassword = await bcrypt.hash(input.password, 5);
 		const user = await this.clientRep.save({ ...dtoNoId, password: hashPassword });
 		const { password, ...userShrinked } = { ...user };
-		return { token: await this.generateToken(user), user: userShrinked as any };
+		return { token: await this.generateToken(user), user: { ...userShrinked, role: RolesEnum.Client } as any };
 	}
 
 	async getAll(): Promise<ClientEntity[]> {
