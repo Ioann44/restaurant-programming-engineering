@@ -9,7 +9,6 @@ export class DeliveryEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	// @Column()
 	@ManyToMany(() => DishEntity)
 	dishes: DishEntity[]
 
@@ -31,7 +30,6 @@ export class DeliveryEntity {
 	@Column("text")
 	address: string;
 
-	// @Column()
 	@ManyToOne(() => ClientEntity, { nullable: true })
 	@JoinColumn()
 	client: ClientEntity;

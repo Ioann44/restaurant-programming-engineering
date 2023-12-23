@@ -1,3 +1,4 @@
+import { ClientDto, StaffDto } from "src/auth/auth.dto";
 import { DishDto } from "src/dish/dish.dto";
 
 export enum DeliveryStatus {
@@ -15,4 +16,6 @@ export class DeliveryDto {
 	createDate: Date;
 	finishDate: Date;
 	address: string;
+	client: ClientDto;
+	courier: StaffDto;
 }
