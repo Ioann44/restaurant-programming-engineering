@@ -34,6 +34,10 @@ export class ClientAuthService {
 		return { token: await this.generateToken(user), user: { ...userShrinked, role: RolesEnum.Client } as any };
 	}
 
+	async getOne(id: number): Promise<ClientEntity> {
+		return this.clientRep.findOne({ where: { id } });
+	}
+
 	async getAll(): Promise<ClientEntity[]> {
 		return this.clientRep.find();
 	}

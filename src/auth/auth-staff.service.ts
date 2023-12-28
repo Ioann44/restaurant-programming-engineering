@@ -35,6 +35,10 @@ export class StaffAuthService {
         return { token: await this.generateToken(user), user: userShrinked as any };
     }
 
+    async getOne(id: number): Promise<StaffEntity> {
+		return this.staffRep.findOne({ where: { id } });
+	}
+
     async getAll(): Promise<StaffEntity[]> {
         return this.staffRep.find();
     }

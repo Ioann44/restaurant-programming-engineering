@@ -13,6 +13,9 @@ export class DishEntity {
 	@Column("int2")
 	weight: number;
 
+	@Column("int", { nullable: true })
+	category: number;
+
 	@Column("text")
 	desc: string;
 
@@ -22,10 +25,6 @@ export class DishEntity {
 	@Column("int2")
 	price: number;
 
-	// @ManyToOne
-	// kitchen: number;
-
-	// @Column()
 	@OneToOne(() => FileEntity, { nullable: true })
 	@JoinColumn()
 	image: FileEntity;

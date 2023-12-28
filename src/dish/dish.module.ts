@@ -14,6 +14,6 @@ import { AuthModule } from "src/auth/auth.module";
         FileModule,
         AuthModule
     ],
-    exports: []
+    exports: [DishService]
 })
 export class DishModule { }
