@@ -25,10 +25,11 @@ export class DeliveryService {
 	}
 
 	async getOne(id: number): Promise<DeliveryEntity> {
-		return this.deliveryRep.findOne({ where: { id }, relations: { dishes: true } });
+		return this.deliveryRep.findOne({ where: { id }, relations: { dishes: true, client: true, courier: true } });
 	}
 
 	async create(input: DeliveryDto): Promise<DeliveryEntity> {
+		delete input.id;
 		const dishes = await Promise.all(
 			input.dishes.map(
 				async dish => {
@@ -49,8 +50,8 @@ export class DeliveryService {
 
 	async update(input: DeliveryDto): Promise<DeliveryEntity> {
 		let objToUpdate: any = { id: input.id };
-		if (input.courier) {
-			objToUpdate.courier = await this.staffService.getOne(input.courier.id);
+		if ("courier" in input) {
+			objToUpdate.courier = !input.courier ? null : await this.staffService.getOne(input.courier.id);
 		}
 		if (input.status) {
 			objToUpdate.status = input.status;
