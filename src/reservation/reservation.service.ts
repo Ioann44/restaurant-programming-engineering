@@ -26,10 +26,8 @@ export class ReservationService {
 
     async create(input: ReservationDto): Promise<ReservationEntity> {
         delete input.id;
-        console.log(input);
         if ("client" in input) {
             input.client = await this.clientService.getOne(input.client.id);
-            console.log(input);
         }
         const saved = await this.reservationRep.save(input);
         return this.reservationRep.findOne({ where: { id: saved.id }, relations: { client: true } });
