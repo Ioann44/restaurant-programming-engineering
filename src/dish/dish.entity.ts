@@ -14,6 +14,9 @@ export class DishEntity {
 	weight: number;
 
 	@Column("int", { nullable: true })
+	kitchen: number;
+	
+	@Column("int", { nullable: true })
 	category: number;
 
 	@Column("text")
