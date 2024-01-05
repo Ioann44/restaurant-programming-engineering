@@ -1,9 +1,3 @@
-export enum DishKitchen {
-	American,
-	Italian,
-	Russian
-}
-
 export enum DishCategory {
 	Drinks,
 	Fastfood,
@@ -15,7 +9,7 @@ export class DishDto {
 	id: number;
 	name: string;
 	weight: number;
-	kitchen: DishKitchen;
+	kitchen: number;
 	category: DishCategory;
 	desc: string;
 	calories: number;

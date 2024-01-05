@@ -10,8 +10,6 @@ async function bootstrap() {
   const minioService = app.get<MinioService>(MinioService);
   await minioService.createBucketIfNotExists();
 
-  
-
   app.enableCors({
     origin: (origin, callback) => {
       if (true) {

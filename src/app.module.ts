@@ -6,6 +6,7 @@ import { DishModule } from "./dish/dish.module";
 import { FileModule } from "./file/file.module";
 import { DeliveryModule } from "./delivery/delivery.module";
 import { ReservationModule } from "./reservation/reservation.module";
+import { KitchenModule } from "./kitchen/kitchen.module";
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { ReservationModule } from "./reservation/reservation.module";
     FileModule,
     DishModule,
     DeliveryModule,
-    ReservationModule
+    ReservationModule,
+    KitchenModule
   ],
   controllers: [],
   providers: [],
