@@ -39,6 +39,7 @@ services:
       - "9001:9001"
     volumes:
       - minio-data:/data
+      - minio-certs:/certs
     healthcheck:
       test:
         [
@@ -75,4 +76,7 @@ volumes:
     name: pe-database
   minio-data:
     driver: local
-    name: pe-minio
+    name: pe-minio-data
+  minio-certs:
+    driver: local
+    name: pe-minio-certs
