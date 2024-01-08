@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ReservationEntity } from "./reservation.entity";
-import { Repository } from "typeorm";
+import { Between, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ClientAuthService } from "src/auth/auth-client.service";
 import { ReservationDto } from "./reservation.dto";
@@ -39,5 +39,16 @@ export class ReservationService {
         }
         await this.reservationRep.update(input.id, input);
         return this.getOne(input.id);
+    }
+
+    async getTablesOnDate(date: Date): Promise<Set<number>> {
+        const startDate = new Date(date);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(date);
+        endDate.setHours(23, 59, 59, 999);
+
+        const reservations = await this.reservationRep.find({ where: { reservationDate: Between(startDate, endDate) } });
+        const usedTables = reservations.flatMap(item => item.tables);
+        return new Set(usedTables);
     }
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { DishEntity } from "./dish.entity";
 import { Repository } from "typeorm";
 import { FileService } from "src/file/file.service";
+import { DishDto } from "./dish.dto";
 
 @Injectable()
 export class DishService {
@@ -48,5 +49,9 @@ export class DishService {
             await this.dishRep.delete({ id });
         }
         return id;
+    }
+
+    entityToDto(input: DishEntity): DishDto {
+        return { ...input, image: input.image ? input.image.key : "" };
     }
 }

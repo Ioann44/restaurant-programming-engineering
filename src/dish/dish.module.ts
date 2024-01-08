@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DishController } from "./dish.controller";
 import { DishEntity } from "./dish.entity";
@@ -12,7 +12,7 @@ import { AuthModule } from "src/auth/auth.module";
     imports: [
         TypeOrmModule.forFeature([DishEntity]),
         FileModule,
-        AuthModule
+        forwardRef(() => AuthModule)
     ],
     exports: [DishService]
 })

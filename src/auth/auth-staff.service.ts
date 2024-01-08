@@ -6,16 +6,18 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 import { StaffEntity } from "./auth.entity";
 import { StaffDto, StaffSuppressedDto, UserReturnedDto } from "./auth.dto";
+import { RestaurantService } from "src/restaurant/restaurant.service";
 
 @Injectable()
 export class StaffAuthService {
     constructor(
         @InjectRepository(StaffEntity) private readonly staffRep: Repository<StaffEntity>,
+        private readonly restaurantService: RestaurantService,
         private jwtService: JwtService
     ) { }
 
     async login(input: StaffDto): Promise<UserReturnedDto> {
-        const user = await this.staffRep.findOne({ where: { email: input.email } });
+        const user = await this.staffRep.findOne({ where: { email: input.email }, relations: { restaurant: true } });
         if (user && await bcrypt.compare(input.password, user.password)) {
             const { password, ...userShrinked } = { ...user };
             return { token: await this.generateToken(user), user: userShrinked as any };
@@ -29,6 +31,9 @@ export class StaffAuthService {
         if (candidate) {
             throw new ConflictException("Этот логин уже занят");
         }
+        if ("restaurant" in input) {
+            (dtoNoId as any).restaurant = await this.restaurantService.getOne((input as any).restaurant.id);
+        }
         const hashPassword = await bcrypt.hash(input.password, 5);
         const user = await this.staffRep.save({ ...dtoNoId, password: hashPassword });
         const { password, ...userShrinked } = { ...user };
@@ -36,11 +41,11 @@ export class StaffAuthService {
     }
 
     async getOne(id: number): Promise<StaffEntity> {
-		return this.staffRep.findOne({ where: { id } });
-	}
+        return this.staffRep.findOne({ where: { id }, relations: { restaurant: true } });
+    }
 
     async getAll(): Promise<StaffEntity[]> {
-        return this.staffRep.find();
+        return this.staffRep.find({ relations: { restaurant: true } });
     }
 
     async update(input: StaffDto): Promise<StaffEntity> {
@@ -48,8 +53,11 @@ export class StaffAuthService {
         if (input.password) {
             inputShrinked.password = await bcrypt.hash(input.password, 5);
         }
-        const saved = await this.staffRep.update(input.id, inputShrinked);
-        return this.staffRep.findOne({ where: { id: input.id } });
+        if ("restaurant" in input) {
+            (input as any).restaurant = await this.restaurantService.getOne((input as any).restaurant.id);
+        }
+        await this.staffRep.update(input.id, inputShrinked);
+        return this.getOne(input.id);
     };
 
     async delete(id: number): Promise<number> {

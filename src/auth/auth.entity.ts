@@ -1,6 +1,7 @@
 import { DeliveryEntity } from "src/delivery/delivery.entity";
 import { ReservationEntity } from "src/reservation/reservation.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { RestaurantEntity } from "src/restaurant/restaurant.entity";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("staff")
 export class StaffEntity {
@@ -13,6 +14,9 @@ export class StaffEntity {
     @Column("int")
     role: number;
 
+    @ManyToOne(() => RestaurantEntity, {nullable: true})
+    restaurant: RestaurantEntity;
+
     @Column({ length: 15, nullable: true })
     phone: string;
 
@@ -22,7 +26,6 @@ export class StaffEntity {
     @Column({ length: 255 })
     password: string;
 
-    // @Column()
     @OneToMany(() => DeliveryEntity, (delivery) => delivery.courier, { nullable: true })
     deliveries: DeliveryEntity[];
 }

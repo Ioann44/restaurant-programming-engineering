@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ReservationEntity } from "./reservation.entity";
 import { ReservationController } from "./reservation.controller";
@@ -10,8 +10,8 @@ import { AuthModule } from "src/auth/auth.module";
     providers: [ReservationService],
     imports: [
         TypeOrmModule.forFeature([ReservationEntity]),
-        AuthModule
+        forwardRef(() => AuthModule)
     ],
-    exports: []
+    exports: [ReservationService]
 })
 export class ReservationModule { }
