@@ -17,11 +17,11 @@ export class DeliveryService {
 	) { }
 
 	async getAll(): Promise<DeliveryEntity[]> {
-		return this.deliveryRep.find({ relations: { client: true, courier: true } });
+		return this.deliveryRep.find({ relations: { client: true, courier: true, dishes: true } });
 	}
 
 	async getAllOfUser(id: number): Promise<DeliveryEntity[]> {
-		return this.deliveryRep.find({ where: { client: { id } } });
+		return this.deliveryRep.find({ where: { client: { id } }, relations: { client: true, courier: true, dishes: true } });
 	}
 
 	async getOne(id: number): Promise<DeliveryEntity> {
@@ -45,7 +45,7 @@ export class DeliveryService {
 			courier: null,
 			status: DeliveryStatus.Accepted
 		});
-		return this.deliveryRep.findOne({ where: { id: saved.id }, relations: { dishes: true, client: true, courier: true } });
+		return this.getOne(saved.id);
 	}
 
 	async update(input: DeliveryDto): Promise<DeliveryEntity> {
@@ -61,6 +61,6 @@ export class DeliveryService {
 		}
 
 		await this.deliveryRep.update(input.id, objToUpdate);
-		return this.deliveryRep.findOne({ where: { id: input.id }, relations: { dishes: true, client: true, courier: true } });
+		return this.getOne(input.id);
 	}
 }
