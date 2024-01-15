@@ -43,10 +43,10 @@ export class DishService {
     async deleteOne(id: number): Promise<number> {
         var item = await this.dishRep.findOne({ where: { id }, relations: { image: true } });
         if (item) {
+            await this.dishRep.delete({ id });
             if (item.image) {
                 await this.fileService.removeFile(item.image.id);
             }
-            await this.dishRep.delete({ id });
         }
         return id;
     }

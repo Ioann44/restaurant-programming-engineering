@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Put, Req, UseGuards, Param } from "@nestjs/common";
 import { ReservationService } from "./reservation.service";
 import { RolesEnum } from "src/auth/auth.dto";
 import { JwtAuthGuard, Roles, TokenParser } from "src/auth/jwt-auth.guard";
@@ -18,12 +18,9 @@ export class ReservationController {
 		return this.reservationService.getAll();
 	}
 
-	@Get("by-user")
-	@UseGuards(JwtAuthGuard)
-	@Roles(RolesEnum.Client)
-	async getOfUser(@Req() req) {
-		const tokenData = this.tokenParser.parse(req);
-		return this.reservationService.getAllOfUser((await tokenData).id);
+	@Get("by-user/:id")
+	async getOfUser(@Param("id") id: number) {
+		return this.reservationService.getAllOfUser(id);
 	}
 
 	@Put()

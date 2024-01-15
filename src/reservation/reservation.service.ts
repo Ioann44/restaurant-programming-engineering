@@ -13,7 +13,7 @@ export class ReservationService {
     ) { }
 
     async getAll(): Promise<ReservationEntity[]> {
-        return this.reservationRep.find();
+        return this.reservationRep.find({relations: { client: true }});
     }
 
     async getAllOfUser(id: number): Promise<ReservationEntity[]> {
