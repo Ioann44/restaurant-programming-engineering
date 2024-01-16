@@ -1,0 +1,4 @@
+services:
+
+  server:
+    command: sh -c "npm run build && npm run start:prod"

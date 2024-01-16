@@ -8,3 +8,12 @@ Then list tables
 \c database
 \dt
 ```
+## Delpoy
+For development simply
+```cmd
+docker compose up -d
+```
+For production
+```cmd
+docker compose -f compose.yml -f compose.prod.yml up -d
+```
