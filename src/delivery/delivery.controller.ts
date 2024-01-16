@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Put, Req, UseGuards, Param } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Put, Req, UseGuards } from "@nestjs/common";
 import { DeliveryService } from "./delivery.service";
 import { DeliveryDto } from "./delivery.dto";
 import { JwtAuthGuard, Roles, TokenParser } from "src/auth/jwt-auth.guard";
@@ -18,9 +18,12 @@ export class DeliveryController {
 		return this.deliveryService.getAll();
 	}
 
-	@Get("by-user/:id")
-	async getOfUser(@Param("id") id: number) {
-		return this.deliveryService.getAllOfUser(id);
+	@Get("by-user")
+	@UseGuards(JwtAuthGuard)
+	@Roles(RolesEnum.Client)
+	async getOfUser(@Req() req) {
+		const tokenData = this.tokenParser.parse(req);
+		return this.deliveryService.getAllOfUser((await tokenData).id);
 	}
 
 	@Put()

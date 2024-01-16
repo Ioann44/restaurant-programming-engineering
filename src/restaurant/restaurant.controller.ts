@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -22,15 +23,14 @@ export class RestaurantController {
     private readonly restaurantService: RestaurantService,
     private readonly dishService: DishService,
     private readonly reservationsService: ReservationService,
-  ) {}
+  ) { }
 
-  @Get('')
+  @Get()
   async getAll(@Body() input: DateDto): Promise<RestaurantDto[]> {
-    console.log(input);
-
     const usedTables = !('date' in input)
       ? new Set([] as number[])
       : await this.reservationsService.getTablesOnDate(input.date);
+
     let restaurants = await this.restaurantService.getAll();
     for (const item of restaurants) {
       let tables: TableDto[] = [];
@@ -51,6 +51,11 @@ export class RestaurantController {
         .reduce((sum: number, item: TableDto) => sum + item.capacity, 0);
     }
     return restaurants as any;
+  }
+
+  @Post()
+  async getAllPost(@Body() input: DateDto): Promise<RestaurantDto[]> {
+    return this.getAll(input);
   }
 
   @Get('one/:id')

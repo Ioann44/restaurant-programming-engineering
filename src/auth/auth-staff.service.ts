@@ -49,6 +49,9 @@ export class StaffAuthService {
     }
 
     async update(input: StaffDto): Promise<StaffEntity> {
+        if (!await this.getOne(input.id)) {
+            return null;
+        }
         const { deliveries, ...inputShrinked } = { ...input };
         if (input.password) {
             inputShrinked.password = await bcrypt.hash(input.password, 5);
@@ -56,7 +59,7 @@ export class StaffAuthService {
         if ("restaurant" in input) {
             (input as any).restaurant = await this.restaurantService.getOne((input as any).restaurant.id);
         }
-        await this.staffRep.update(input.id, inputShrinked);
+        await this.staffRep.save(inputShrinked);
         return this.getOne(input.id);
     };
 

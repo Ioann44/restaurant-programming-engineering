@@ -11,6 +11,7 @@ services:
       POSTGRES_DB: database
     ports:
       - 5432:5432
+    restart: unless-stopped
     volumes:
       - database-data:/var/lib/postgresql/data
     healthcheck:
@@ -37,6 +38,7 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    restart: unless-stopped
     volumes:
       - minio-data:/data
       - minio-certs:/certs
@@ -59,7 +61,7 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "3000:3000"
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       database:
         condition: service_healthy
