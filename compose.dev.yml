@@ -1,0 +1,14 @@
+services:
+
+  database:
+    ports:
+      - 5432:5432
+
+  minio:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  server:
+    ports:
+      - "3000:3000"
